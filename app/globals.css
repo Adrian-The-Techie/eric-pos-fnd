@@ -557,3 +557,54 @@ tbody tr:hover { background: var(--surface-2); }
   
   .btn { width: 100%; justify-content: center; } /* Optional: make buttons full width on small screens */
 }
+
+/* ─── Settings Page Fixes ────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .settings-layout { 
+    grid-template-columns: 1fr !important;
+    height: auto !important;
+    display: block !important;
+  }
+  .settings-sidebar {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    padding: 12px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 20 !important;
+    background: var(--bg-alt) !important;
+    scrollbar-width: none;
+  }
+  .settings-sidebar::-webkit-scrollbar { display: none; }
+  .settings-nav-item {
+    flex-shrink: 0 !important;
+    padding: 10px 16px !important;
+    border: 1px solid var(--border) !important;
+    margin-right: 8px;
+    background: var(--surface) !important;
+  }
+  .settings-nav-item.active {
+    background: var(--primary) !important;
+    color: white !important;
+  }
+  .settings-nav-item.active .label { color: white !important; }
+  .settings-nav-item .sub { display: none !important; }
+  .settings-main { 
+    padding: 16px !important; 
+    overflow: visible !important;
+  }
+  .settings-content-card { 
+    padding: 16px !important; 
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+  .settings-page {
+    height: auto !important;
+    overflow-y: auto !important;
+    display: block !important;
+  }
+}

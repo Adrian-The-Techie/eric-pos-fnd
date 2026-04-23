@@ -156,8 +156,13 @@ export default function SettingsPage() {
 
       <style jsx>{`
         .settings-page { height: 100vh; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
-        .settings-layout { flex: 1; display: grid; grid-template-columns: 280px 1fr; background: var(--surface); height: calc(100vh - var(--header-height)); }
-        
+        .settings-layout { 
+          flex: 1; 
+          display: grid; 
+          grid-template-columns: 280px 1fr; 
+          background: var(--surface); 
+          height: calc(100vh - var(--header-height)); 
+        }
         .settings-sidebar { border-right: 1px solid var(--border); padding: 24px 12px; display: flex; flex-direction: column; gap: 8px; background: var(--bg-alt); }
         .settings-nav-item {
           display: flex; align-items: flex-start; gap: 14px; padding: 14px; border-radius: 12px;
@@ -166,15 +171,12 @@ export default function SettingsPage() {
         }
         .settings-nav-item:hover { background: var(--surface); }
         .settings-nav-item.active { background: white; border-color: var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        
         .settings-nav-item .icon { font-size: 20px; padding-top: 2px; }
         .settings-nav-item .label { font-size: 14px; font-weight: 600; color: var(--text); }
         .settings-nav-item .sub { font-size: 12px; color: var(--text-3); margin-top: 2px; }
         .settings-nav-item.active .label { color: var(--primary); }
-        
         .settings-main { flex: 1; overflow-y: auto; padding: 40px; }
         .settings-content-card { max-width: 800px; padding: 32px; border-radius: 20px; }
-        
         h3 { font-size: 18px; font-weight: 700; color: var(--text); }
       `}</style>
     </div>
