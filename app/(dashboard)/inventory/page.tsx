@@ -135,22 +135,23 @@ export default function InventoryPage() {
     <>
       <div className="topbar">
         <div className="topbar-title">Inventory</div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <div ref={dropdownRef} style={{ position: 'relative' }}>
             <button className="btn btn-secondary" onClick={() => setActionsOpen(!actionsOpen)}>
-              ⚡ Product Actions ▾
+              ⚡ Actions ▾
             </button>
             {actionsOpen && (
-              <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: 4, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 8, boxShadow: '0 10px 25px -5px rgba(0,0,0,0.2)', minWidth: 220, zIndex: 100, overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 10, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, boxShadow: 'var(--shadow-lg)', minWidth: 200, zIndex: 1000, overflow: 'hidden' }}>
                 <Link href="/inventory/movements" style={{ display: 'block', padding: '12px 16px', color: 'var(--text-1)', textDecoration: 'none', borderBottom: '1px solid var(--border-light)', fontSize: 13, fontWeight: 500 }} onClick={() => setActionsOpen(false)}>📊 Stock Movements</Link>
                 <Link href="/inventory/restock" style={{ display: 'block', padding: '12px 16px', color: 'var(--text-1)', textDecoration: 'none', borderBottom: '1px solid var(--border-light)', fontSize: 13, fontWeight: 500 }} onClick={() => setActionsOpen(false)}>📥 Restock (GRN)</Link>
-                <Link href="/inventory/stock-take" style={{ display: 'block', padding: '12px 16px', color: 'var(--text-1)', textDecoration: 'none', fontSize: 13, fontWeight: 500 }} onClick={() => setActionsOpen(false)}>📋 Stock Take</Link>
+                <Link href="/inventory/stock-take" style={{ display: 'block', padding: '12px 16px', color: 'var(--text-1)', textDecoration: 'none', borderBottom: '1.5px solid var(--border-light)', fontSize: 13, fontWeight: 500 }} onClick={() => setActionsOpen(false)}>📋 Stock Take</Link>
+                
+                <button style={{ display: 'flex', width: '100%', border: 'none', background: 'none', padding: '12px 16px', color: 'var(--text-1)', fontSize: 13, fontWeight: 500, cursor: 'pointer', borderBottom: '1px solid var(--border-light)' }} onClick={() => { setShowCatModal(true); setActionsOpen(false) }}>📁 Add Category</button>
+                <button style={{ display: 'flex', width: '100%', border: 'none', background: 'none', padding: '12px 16px', color: 'var(--text-1)', fontSize: 13, fontWeight: 500, cursor: 'pointer' }} onClick={() => { setShowSubCatModal(true); setActionsOpen(false) }}>📂 Add Sub-Category</button>
               </div>
             )}
           </div>
-          <button className="btn btn-secondary btn-sm" onClick={() => setShowCatModal(true)}>+ Category</button>
-          <button className="btn btn-secondary btn-sm" onClick={() => setShowSubCatModal(true)}>+ Sub-category</button>
-          <button className="btn btn-primary" onClick={() => openProduct()}>+ Add Product</button>
+          <button className="btn btn-primary" onClick={() => openProduct()}>+ Product</button>
         </div>
       </div>
 
