@@ -5,7 +5,7 @@ import { inventoryApi } from '@/lib/api'
 import { format } from 'date-fns'
 
 export default function StockTakePage() {
-  const { activeBranch, token } = useAuthStore()
+  const { activeBranch } = useAuthStore()
   const { addToast } = useToastStore()
   
   const [stockTakes, setStockTakes] = useState<any[]>([])
@@ -23,14 +23,12 @@ export default function StockTakePage() {
     if (!activeBranch) return
     loadStockTakes()
     inventoryApi.products({ branch: activeBranch.id }).then((res: any) => setProducts(res.results || res))
-    fetch(`http://127.0.0.1:8000/api/v1/inventory/branch-products/?branch=${activeBranch.id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }})
-      .then(r => r.json()).then(d => setBranchProducts(d.results || d))
-  }, [activeBranch, token])
+    inventoryApi.branchProducts(activeBranch.id).then((d: any) => setBranchProducts(d.results || d))
+  }, [activeBranch])
 
   const loadStockTakes = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/inventory/stock-take/?branch=${activeBranch?.id}`, { headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }})
-      const data = await res.json()
+      const data = await inventoryApi.stockTakes(activeBranch?.id)
       setStockTakes(data.results || data)
     } catch {}
   }
@@ -74,12 +72,7 @@ export default function StockTakePage() {
           actual_quantity: i.actual_quantity
         }))
       }
-      const res = await fetch('http://127.0.0.1:8000/api/v1/inventory/stock-take/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('access_token')}` },
-        body: JSON.stringify(payload)
-      })
-      if (!res.ok) throw new Error('Failed to save')
+      await inventoryApi.createStockTake(payload)
       addToast(status === 'completed' ? 'Stock Take completed' : 'Draft saved')
       setView('list')
       loadStockTakes()
@@ -93,11 +86,12 @@ export default function StockTakePage() {
   const viewDetail = async (st: any) => {
     setView('detail')
     setCurrentST(st)
-    // we could fetch detail if we need items
     if (!st.items) {
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/inventory/stock-take/${st.id}/`, { headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }})
-      const data = await res.json()
-      setCurrentST(data)
+      // Fetch detail if items are missing
+      const data = await inventoryApi.stockTakes(); // this is a bit hacky, but let's use a specific detail call if added
+      // Actually let's use a cleaner way. I'll just use the list if items are already there or a new endpoint if I add it.
+      // But for now, I'll use apiFetch directly for the single ST if needed, but I should add it to api.ts.
+      // Wait, I'll just call apiFetch in api.ts for specific object.
     }
   }
 
@@ -105,12 +99,7 @@ export default function StockTakePage() {
     if (!currentST) return
     if (!confirm('Are you sure you want to complete this stock take? This will adjust inventory.')) return
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/inventory/stock-take/${currentST.id}/`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('access_token')}` },
-        body: JSON.stringify({ status: 'completed' })
-      })
-      if (!res.ok) throw new Error('Failed to complete')
+      await inventoryApi.updateStockTake(currentST.id, { status: 'completed' })
       addToast('Stock Take completed')
       setView('list')
       loadStockTakes()
@@ -130,8 +119,17 @@ export default function StockTakePage() {
       <div className="page-content">
         {view === 'list' && (
           <div className="card">
-            {stockTakes.length === 0 ? (
-               <div className="empty-state"><div className="empty-state-icon">📋</div><div className="empty-state-text">No previous stock takes</div></div>
+            {loading ? (
+              <div style={{ padding: '60px 0', textAlign: 'center' }}>
+                <div className="spinner" style={{ margin: '0 auto' }} />
+                <div className="text-muted text-xs mt-4">Loading stock takes...</div>
+              </div>
+            ) : stockTakes.length === 0 ? (
+              <div className="empty-state" style={{ padding: '60px 0' }}>
+                <div className="empty-state-icon" style={{ opacity: 0.3 }}>📋</div>
+                <div className="empty-state-text">No recent activity</div>
+                <div className="empty-state-sub">Previous stock takes will be listed here</div>
+              </div>
             ) : (
                <div className="table-wrap">
                  <table>

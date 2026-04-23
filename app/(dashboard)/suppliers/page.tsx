@@ -16,11 +16,7 @@ export default function SuppliersPage() {
   const loadSuppliers = async () => {
     setLoading(true)
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/inventory/suppliers/', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-      })
-      if (!res.ok) throw new Error('Failed to load')
-      const data = await res.json()
+      const data = await inventoryApi.suppliers()
       setSuppliers(data.results || data)
     } catch {
       addToast('Failed to load suppliers', 'error')
@@ -36,14 +32,11 @@ export default function SuppliersPage() {
     const fd = new FormData(e.target)
     const data = Object.fromEntries(fd)
     try {
-      const url = editing ? `http://127.0.0.1:8000/api/v1/inventory/suppliers/${editing.id}/` : 'http://127.0.0.1:8000/api/v1/inventory/suppliers/'
-      const method = editing ? 'PATCH' : 'POST'
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('access_token')}` },
-        body: JSON.stringify(data)
-      })
-      if (!res.ok) throw new Error('Failed to save')
+      if (editing) {
+        await inventoryApi.updateSupplier(editing.id, data)
+      } else {
+        await inventoryApi.createSupplier(data)
+      }
       addToast('Supplier saved')
       setShowModal(false)
       loadSuppliers()

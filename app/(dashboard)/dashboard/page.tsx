@@ -119,14 +119,15 @@ export default function DashboardPage() {
             </div>
           </div>
           {loading ? (
-            <div style={{ padding: '40px 0', textAlign: 'center' }}>
+            <div style={{ padding: '60px 0', textAlign: 'center' }}>
               <div className="spinner" style={{ margin: '0 auto' }} />
+              <div className="text-muted text-xs mt-4">Loading activity...</div>
             </div>
           ) : recentSales.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">🧾</div>
-              <div className="empty-state-text">No sales yet today</div>
-              <div className="empty-state-sub">Head to Point of Sale to create a sale</div>
+            <div className="empty-state" style={{ padding: '60px 0' }}>
+              <div className="empty-state-icon" style={{ opacity: 0.3 }}>🧾</div>
+              <div className="empty-state-text">No recent activity</div>
+              <div className="empty-state-sub">New transactions will appear here as they happen</div>
             </div>
           ) : (
             <div className="table-wrap">

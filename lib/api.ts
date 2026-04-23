@@ -1,5 +1,5 @@
 // Base API URL — change to your Django server URL
-export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'
+export const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api/v1'
 
 // ─── Token helpers ────────────────────────────────────────────
 export const getToken = (): string | null => {
@@ -20,7 +20,7 @@ export const clearTokens = () => {
 }
 
 // ─── Auth headers ─────────────────────────────────────────────
-export const authHeaders = () => {
+export const authHeaders = (): Record<string, string> => {
   const token = getToken()
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
@@ -66,9 +66,9 @@ async function apiFetch<T>(endpoint: string, options: FetchOptions = {}): Promis
 
 // ─── Auth ─────────────────────────────────────────────────────
 export const authApi = {
-  login: (email: string, password: string) =>
+  login: (phone: string, password: string) =>
     apiFetch<{ access: string; refresh: string; user: any }>('/auth/login/', {
-      method: 'POST', json: { email, password },
+      method: 'POST', json: { phone, password },
     }),
   me: () => apiFetch<any>('/auth/me/'),
   users: () => apiFetch<any>('/auth/users/'),
@@ -78,7 +78,7 @@ export const authApi = {
 
 // ─── Branches ─────────────────────────────────────────────────
 export const branchApi = {
-  list: () => apiFetch<any[]>('/branches/'),
+  list: () => apiFetch<any>('/branches/'),
   create: (data: any) => apiFetch<any>('/branches/', { method: 'POST', json: data }),
   update: (id: string, data: any) => apiFetch<any>(`/branches/${id}/`, { method: 'PATCH', json: data }),
   getSettings: (id: string) => apiFetch<any>(`/branches/${id}/settings/`),
@@ -88,7 +88,7 @@ export const branchApi = {
 
 // ─── Customers ────────────────────────────────────────────────
 export const customerApi = {
-  list: (params?: Record<string, string>) => {
+  list: (params?: any) => {
     const q = params ? '?' + new URLSearchParams(params).toString() : ''
     return apiFetch<any>(`/customers/${q}`)
   },
@@ -105,14 +105,14 @@ export const customerApi = {
 
 // ─── Inventory ────────────────────────────────────────────────
 export const inventoryApi = {
-  categories: () => apiFetch<any[]>('/inventory/categories/'),
+  categories: () => apiFetch<any>('/inventory/categories/'),
   createCategory: (data: any) => apiFetch<any>('/inventory/categories/', { method: 'POST', json: data }),
   updateCategory: (id: string, data: any) => apiFetch<any>(`/inventory/categories/${id}/`, { method: 'PATCH', json: data }),
   deleteCategory: (id: string) => apiFetch<void>(`/inventory/categories/${id}/`, { method: 'DELETE' }),
 
   subcategories: (categoryId?: string) => {
     const q = categoryId ? `?category=${categoryId}` : ''
-    return apiFetch<any[]>(`/inventory/subcategories/${q}`)
+    return apiFetch<any>(`/inventory/subcategories/${q}`)
   },
   createSubcategory: (data: any) => apiFetch<any>('/inventory/subcategories/', { method: 'POST', json: data }),
 
@@ -124,7 +124,8 @@ export const inventoryApi = {
   updateProduct: (id: string, data: any) => apiFetch<any>(`/inventory/products/${id}/`, { method: 'PATCH', json: data }),
   deleteProduct: (id: string) => apiFetch<void>(`/inventory/products/${id}/`, { method: 'DELETE' }),
 
-  branchProducts: (branchId: string) => apiFetch<any[]>(`/inventory/branch-products/?branch=${branchId}`),
+  branchProducts: (branchId: string) => apiFetch<any>(`/inventory/branch-products/?branch=${branchId}`),
+  createBranchProduct: (data: any) => apiFetch<any>('/inventory/branch-products/', { method: 'POST', json: data }),
   updateBranchProduct: (id: number, data: any) =>
     apiFetch<any>(`/inventory/branch-products/${id}/`, { method: 'PATCH', json: data }),
 
@@ -133,12 +134,31 @@ export const inventoryApi = {
     const q = params ? '?' + new URLSearchParams(params).toString() : ''
     return apiFetch<any>(`/inventory/stock/movements/${q}`)
   },
+  stockStatement: (params: any) => {
+    const q = '?' + new URLSearchParams(params).toString()
+    return apiFetch<any>(`/inventory/stock/statement/${q}`)
+  },
+  
+  suppliers: () => apiFetch<any>('/inventory/suppliers/'),
+  getSupplier: (id: string) => apiFetch<any>(`/inventory/suppliers/${id}/`),
+  createSupplier: (data: any) => apiFetch<any>('/inventory/suppliers/', { method: 'POST', json: data }),
+  updateSupplier: (id: string, data: any) => apiFetch<any>(`/inventory/suppliers/${id}/`, { method: 'PATCH', json: data }),
   supplierStatement: (id: string, from?: string, to?: string) => {
     const params = new URLSearchParams()
     if (from) params.set('from', from)
     if (to) params.set('to', to)
     return apiFetch<any>(`/inventory/suppliers/${id}/statement/?${params}`)
   },
+
+  createGRN: (data: any) => apiFetch<any>('/inventory/grn/', { method: 'POST', json: data }),
+
+  stockTakes: (branchId?: string) => {
+    const q = branchId ? `?branch=${branchId}` : ''
+    return apiFetch<any>(`/inventory/stock-take/${q}`)
+  },
+  createStockTake: (data: any) => apiFetch<any>('/inventory/stock-take/', { method: 'POST', json: data }),
+  updateStockTake: (id: string, data: any) => apiFetch<any>(`/inventory/stock-take/${id}/`, { method: 'PATCH', json: data }),
+
   stockReport: (branchId: string, from?: string, to?: string) => {
     const params = new URLSearchParams({ branch: branchId })
     if (from) params.append('from', from)
@@ -151,7 +171,7 @@ export const inventoryApi = {
 
 // ─── Sales ────────────────────────────────────────────────────
 export const salesApi = {
-  list: (params?: Record<string, string>) => {
+  list: (params?: any) => {
     const q = params ? '?' + new URLSearchParams(params).toString() : ''
     return apiFetch<any>(`/sales/${q}`)
   },
@@ -160,7 +180,7 @@ export const salesApi = {
 
   hold: (saleId: string, label: string) =>
     apiFetch<any>('/sales/hold/', { method: 'POST', json: { sale_id: saleId, label } }),
-  heldList: (branchId: string) => apiFetch<any[]>(`/sales/held/?branch=${branchId}`),
+  heldList: (branchId: string) => apiFetch<any>(`/sales/held/?branch=${branchId}`),
   retrieveHeld: (heldId: number) =>
     apiFetch<any>(`/sales/held/${heldId}/retrieve/`, { method: 'POST' }),
 

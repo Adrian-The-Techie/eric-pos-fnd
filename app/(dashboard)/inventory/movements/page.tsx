@@ -34,19 +34,14 @@ export default function StockMovementsPage() {
     
     setLoading(true)
     try {
-      const qs = new URLSearchParams()
-      qs.append('branch', activeBranch.id.toString())
-      qs.append('product', selectedProduct)
-      if (dateFrom) qs.append('from', dateFrom)
-      if (dateTo) qs.append('to', dateTo)
+      const params: Record<string, string> = {
+        branch: activeBranch.id.toString(),
+        product: selectedProduct
+      }
+      if (dateFrom) params.from = dateFrom
+      if (dateTo) params.to = dateTo
       
-      const token = useAuthStore.getState().token
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/inventory/stock/statement/?${qs.toString()}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-      })
-      
-      if (!res.ok) throw new Error('Failed to load statement')
-      const data = await res.json()
+      const data = await inventoryApi.stockStatement(params)
       setStatement(data)
     } catch (err: any) {
       addToast(err.message, 'error')

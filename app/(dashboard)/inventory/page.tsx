@@ -88,12 +88,7 @@ export default function InventoryPage() {
         await inventoryApi.updateProduct(editProduct.product.id, pForm)
       } else {
         const p = await inventoryApi.createProduct(pForm)
-        // Add to branch
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1'}/inventory/branch-products/`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('access_token')}` },
-          body: JSON.stringify({ branch: activeBranch!.id, product_id: p.id, stock_quantity: 0 })
-        })
+        await inventoryApi.createBranchProduct({ branch: activeBranch!.id, product_id: p.id, stock_quantity: 0 })
       }
       addToast(editProduct ? 'Product updated' : 'Product added')
       setShowProductModal(false)

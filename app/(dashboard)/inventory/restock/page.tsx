@@ -4,7 +4,7 @@ import { useAuthStore, useToastStore } from '@/lib/store'
 import { inventoryApi } from '@/lib/api'
 
 export default function RestockPage() {
-  const { activeBranch, token } = useAuthStore()
+  const { activeBranch } = useAuthStore()
   const { addToast } = useToastStore()
 
   const [suppliers, setSuppliers] = useState<any[]>([])
@@ -18,9 +18,8 @@ export default function RestockPage() {
   useEffect(() => {
     if (!activeBranch) return
     inventoryApi.products({ branch: activeBranch.id }).then((res: any) => setProducts(res.results || res))
-    fetch('http://127.0.0.1:8000/api/v1/inventory/suppliers/', { headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }})
-      .then(r => r.json()).then(d => setSuppliers(d.results || d))
-  }, [activeBranch, token])
+    inventoryApi.suppliers().then((d: any) => setSuppliers(d.results || d))
+  }, [activeBranch])
 
   const handleAddItem = () => {
     setItems([...items, { product: '', quantity: '1', unit_cost: '0' }])
@@ -67,16 +66,7 @@ export default function RestockPage() {
         }))
       }
 
-      const res = await fetch('http://127.0.0.1:8000/api/v1/inventory/grn/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('access_token')}` },
-        body: JSON.stringify(payload)
-      })
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}))
-        throw new Error(errData.detail || 'Failed to submit restock')
-      }
+      await inventoryApi.createGRN(payload)
       
       addToast(status === 'completed' ? 'Stock updated successfully!' : 'GRN Draft saved')
       setItems([])

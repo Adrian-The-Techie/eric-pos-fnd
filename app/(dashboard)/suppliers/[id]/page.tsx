@@ -26,11 +26,7 @@ export default function SupplierDetailPage() {
 
   const loadSupplier = async () => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/inventory/suppliers/${supplierId}/`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
-      })
-      if (!res.ok) throw new Error('Failed to load')
-      const data = await res.json()
+      const data = await inventoryApi.getSupplier(supplierId)
       setSupplier(data)
     } catch(e) {
       addToast('Failed to load supplier', 'error')

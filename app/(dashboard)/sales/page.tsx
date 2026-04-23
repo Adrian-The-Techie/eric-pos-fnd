@@ -105,9 +105,16 @@ export default function SalesPage() {
           </div>
 
           {loading ? (
-            <div style={{ padding: '40px 0', textAlign: 'center' }}><div className="spinner" style={{ margin: '0 auto' }} /></div>
+            <div style={{ padding: '60px 0', textAlign: 'center' }}>
+              <div className="spinner" style={{ margin: '0 auto' }} />
+              <div className="text-muted text-xs mt-4">Loading sales history...</div>
+            </div>
           ) : filtered.length === 0 ? (
-            <div className="empty-state"><div className="empty-state-icon">🧾</div><div className="empty-state-text">No sales found</div></div>
+            <div className="empty-state" style={{ padding: '60px 0' }}>
+              <div className="empty-state-icon" style={{ opacity: 0.3 }}>🧾</div>
+              <div className="empty-state-text">No recent activity</div>
+              <div className="empty-state-sub">Transactions matching your filters will appear here</div>
+            </div>
           ) : (
             <div className="table-wrap">
               <table>
